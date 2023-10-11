@@ -1,0 +1,96 @@
+<html>
+	<head>
+		<title>Home</title>
+		<link rel="stylesheet" href="css/style.css">
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.fluid.classless.min.css">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+
+		<meta name="theme-color" content="#11191f">
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="default">
+		<link rel="manifest" href="site.webmanifest">
+		<meta name="application-name" content="Counter">
+		<title>Counter</title>
+		<script src="moment.min.js"></script>
+	</head>
+	<body>
+		<header>
+			<nav>
+				<ul>
+					<li><strong>Counters</strong></li>
+				</ul>
+				<ul>
+					<li><a href="#">Code</a></li>
+					<li><a href="#">Export</a></li>
+					<li><a href="#" role="button">Button</a></li>
+				</ul>
+			</nav>
+			<!-- <hgroup> -->
+			<!-- <h1>StatsD</h1> -->
+			<!-- <p>The S stands for Self</p> -->
+			<!-- </hgroup> -->
+		</header>
+
+		<main>
+			<h1>Counters</h1>
+			<table id="counters" role='grid'>
+				<thead>
+					<tr>
+						<th scope="col">Key</th>
+						<th scope="col">Value</th>
+						<th scope="col">Last Updated</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+
+			<h1>Gauges</h1>
+			<table id="gauges" role='grid'>
+				<thead>
+					<tr>
+						<th scope="col">Key</th>
+						<th scope="col">Value</th>
+						<th scope="col">Last Updated</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+
+		</main>
+		<footer>
+			<button id="new-button">+ Add New</button>
+		</footer>
+
+	</body>
+	<dialog id="add-new">
+		<article>
+			<header>
+				<a href="#close" aria-label="Close" class="close"></a>
+				Add a new counter
+			</header>
+			<form method="dialog">
+				<label for="type">
+					Type
+					<select id="type" name="type" required aria-invalid="false">
+						<option value="counters">Counter</option>
+						<option value="gauges">Gauge</option>
+					</select>
+				</label>
+
+				<label for="key">
+					Counter Name
+					<input type="text" id="key" name="key" placeholder="some.value" required aria-invalid="true">
+				</label>
+			</form>
+			<footer>
+				<button id="cancel" class="secondary">Cancel</button>
+				<button id="confirm">Confirm</button>
+			</footer>
+		</article>
+	</dialog>
+	<script src="index.js"></script>
+</html>
