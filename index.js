@@ -1,29 +1,47 @@
-const dialog = document.querySelector("dialog#add-new");
-const showButton = document.querySelector("button#new-button");
-const closeButton = document.querySelector("dialog button#cancel");
-const saveButton = document.querySelector("dialog button#confirm");
-
-// Load the data from local storage
-var data = JSON.parse(localStorage.getItem("data"));
-if (data == null) {
-	data = {
-		counters: {
-			"counter1": ["2023-01-01T00:00:00.000Z", "2023-01-02T00:00:00.000Z", "2023-01-03T00:00:00.000Z"],
-		},
-		gauges: {
+function loadData(){
+	var d = JSON.parse(localStorage.getItem("data"));
+	if (d == null) {
+		d = {
+			counters: {
+				"counter1": ["2023-01-01T12:00:00.000Z", "2023-01-02T21:00:00.000Z", "2023-01-03T18:00:00.000Z"],
+				"tram/4/old": ["2023-01-03T00:00:00.000Z"],
+				"tram/4/new": [],
+			},
+			gauges: {
+			}
+		};
+	}
+	// Convert all datapoints to momentjs
+	for (var key in d.counters) {
+		var counter = d.counters[key];
+		for (var i = 0; i < counter.length; i++) {
+			counter[i] = moment(counter[i]);
 		}
-	};
+	}
+	return d;
 }
 
-// "Show the dialog" button opens the dialog modally
-showButton.addEventListener("click", () => {
-  dialog.showModal();
-});
+// Load the data from local storage
+let data = loadData();
 
-// "Close" button closes the dialog
-closeButton.addEventListener("click", () => {
-  dialog.close();
-});
+// Hook up dialog buttons
+document.querySelectorAll("button[data-dialog]").forEach(button => {
+	button.addEventListener("click", (evt) => {
+		let dialog_id = evt.target.dataset.dialog
+		document.getElementById(dialog_id).showModal();
+
+	});
+})
+
+document.querySelectorAll("dialog button[data-action='cancel']").forEach(button => {
+	button.addEventListener("click", (evt) => {
+		let dialog_id = evt.target.dataset.dialog
+		document.getElementById(dialog_id).showModal();
+
+	});
+})
+
+const saveButton = document.getElementById("add");
 
 saveButton.addEventListener("click", () => {
 	// Get the data from the form
@@ -32,22 +50,18 @@ saveButton.addEventListener("click", () => {
 	data[type][key] = [];
 	dialog.close();
 	saveData();
-	updateTables();
 });
-
-
-// Convert all datapoints to momentjs
-for (var key in data.counters) {
-	var counter = data.counters[key];
-	for (var i = 0; i < counter.length; i++) {
-		counter[i] = moment(counter[i]);
-	}
-}
-
 
 // Save the data to local storage
 function saveData() {
 	localStorage.setItem("data", JSON.stringify(data));
+	updateTables();
+}
+
+function incrementCounter(key){
+	data.counters[key].push(moment());
+	updateTables();
+	saveData();
 }
 
 function updateTables(){
@@ -66,11 +80,19 @@ function updateTables(){
 		row.appendChild(cell);
 
 		cell = document.createElement("td");
+		button = document.createElement("button");
+		button.dataset.key = key;
 		if(counter.length > 0){
-			cell.innerHTML = counter.slice(-1)[0].startOf('day').fromNow();
+			console.log(counter.slice(-1)[0].format('lll'))
+			button.innerHTML = counter.slice(-1)[0].fromNow();
 		} else {
-			cell.innerHTML = "Never";
+			button.innerHTML = "Never";
 		}
+		button.addEventListener("click", (e) => {
+			incrementCounter(e.target.dataset.key);
+		});
+
+		cell.appendChild(button);
 		row.appendChild(cell);
 
 		document.querySelector("#counters tbody").appendChild(row);
