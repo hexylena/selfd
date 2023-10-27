@@ -106,3 +106,12 @@ document.getElementById("key").addEventListener("input", function(e) {
 	// set aria-invalid="true" if the input is invalid, and set an appropriate error message
 	e.target.setAttribute('aria-invalid', e.target.value.length == 0);
 });
+
+document.getElementById("export").addEventListener("click", () => {
+	var a = window.document.createElement('a');
+	a.href = window.URL.createObjectURL(new Blob([JSON.stringify(data)], {type: 'application/json'}));
+	a.download = 'export.json';
+	document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
+})
