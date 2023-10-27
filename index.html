@@ -1,11 +1,13 @@
 <html>
 	<head>
 		<title>Home</title>
-		<link rel="stylesheet" href="css/style.css">
-		<link rel="stylesheet" href="charts.css-1.1.0/dist/charts.css">
 
 		<meta charset="utf-8">
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.fluid.classless.min.css">
+
+		<link rel="stylesheet" href="css/pico.fluid.classless.min.css">
+		<link rel="stylesheet" href="css/charts.css-1.1.0/dist/charts.css">
+		<link rel="stylesheet" href="css/style.css">
+
 		<meta name="viewport" content="width=device-width,initial-scale=1">
 
 		<meta name="theme-color" content="#11191f">
@@ -24,9 +26,8 @@
 					<li><hgroup><h1>SelfD</h1><p>Like StatsD for urself</p></hgroup></li>
 				</ul>
 				<ul>
-					<li><a href="https://github.com/hexylena/selfd">Code</a></li>
-					<li><a href="#">Export</a></li>
-					<li><a href="#" role="button">Button</a></li>
+					<li><button role="button" data-dialog="add-new">+ Add New</button></li>
+					<li><button role="button" data-dialog="graph-it">Graph It</button></li>
 				</ul>
 			</nav>
 			<!-- <hgroup> -->
@@ -36,6 +37,7 @@
 		</header>
 
 		<main>
+			<article>
 			<h2>Counters</h2>
 			<table id="counters" role='grid'>
 				<thead>
@@ -48,6 +50,7 @@
 				<tbody>
 				</tbody>
 			</table>
+			</article>
 
 			<!--
 			<h2>Gauges</h2>
@@ -66,11 +69,22 @@
 
 		</main>
 		<footer>
-			<button data-dialog="add-new">+ Add New</button>
-			<button data-dialog="graph-it">Graph It</button>
-			<button id="export">Export (JSON)</button>
-			<button id="export-influxdb">Export (InfluxDB)</button>
-			<button id="import" disabled="true">Import (TODO)</button>
+			<nav>
+				<li>
+					<p>
+					The <a href="https://github.com/hexylena/selfd">Code</a> is licensed under AGPL-3.0-or-later.
+					</p>
+				</li>
+				<li>
+				<button role="button" id="export">Export (JSON)</button>
+				</li>
+				<li>
+				<button role="button" id="export-influxdb">Export (InfluxDB)</button>
+				</li>
+				<li>
+				<button role="button" id="import" disabled="true">Import (TODO)</button>
+				</li>
+			</nav>
 		</footer>
 
 	</body>

@@ -1,0 +1,77 @@
+// Load font from biro.woff2
+@font-face {
+	font-family: 'Biro';
+	src: url('biro_script_plus.woff2') format('woff2');
+	font-weight: normal;
+	font-style: normal;
+}
+body {
+	background-image:
+		radial-gradient(#89aee1 10%, transparent 10%),
+		radial-gradient(#89aee1 10%, transparent 10%),
+		radial-gradient(#e9f259 10%, transparent 10%),
+		radial-gradient(#e9f259 10%, transparent 10%);
+	background-position: 0px 0px, 80px 80px, -8px 8px, 72px 88px;
+	background-size: 160px 160px;
+	background-color: #7cf4d3;
+	background-repeat: repeat;
+}
+
+body {
+	--primary: #89aee1 !important;
+	--muted-color: #000 !important; /* for my colour issues */
+	--color: #000 !important;
+}
+@media only screen and (prefers-color-scheme: dark) {
+	body {
+		--primary: #89aee1 !important;
+		--muted-color: #fff !important; /* for my colour issues */
+		--color: #fff !important;
+		background-color: #1d483c;
+	}
+	nav {
+		background: #003e11 !important;
+	}
+}
+
+
+article {
+	box-shadow: 8px 8px var(--contrast);
+	border: 2px solid var(--contrast);
+	border-radius: 0;
+}
+
+header nav {
+	padding: 1em 2em !important;
+}
+
+button {
+	color: black !important;
+	background: #e9f259 !important;
+	box-shadow: 4px 4px var(--contrast) !important;
+	border: 2px solid var(--contrast) !important;
+	border-radius: 30px !important;
+}
+button:hover {
+	color: black;
+	background: #c9d323 !important;
+}
+
+nav {
+	background: #9effb8;
+	box-shadow: 8px 8px var(--contrast);
+	border: 2px solid var(--contrast);
+	border-radius: 0;
+	padding: 0.5em;
+}
+footer nav {
+	color: black !important;
+	background: #d46ce7;
+	/* ,,,, */
+}
+
+
+
+a {
+	text-decoration: underline;
+}
