@@ -107,11 +107,39 @@ document.getElementById("key").addEventListener("input", function(e) {
 	e.target.setAttribute('aria-invalid', e.target.value.length == 0);
 });
 
-document.getElementById("export").addEventListener("click", () => {
+function triggerDownload(contents, type, filename){
 	var a = window.document.createElement('a');
-	a.href = window.URL.createObjectURL(new Blob([JSON.stringify(data)], {type: 'application/json'}));
-	a.download = 'export.json';
+	a.href = window.URL.createObjectURL(new Blob([contents], {type: type}));
+	a.download = filename;
 	document.body.appendChild(a);
 	a.click();
 	document.body.removeChild(a);
+}
+
+function toInflux(d){
+	// myMeasurement,tag1=value1,tag2=value2 fieldKey="fieldValue" 1556813561098000000
+	var lines = [];
+	for (var key in d.counters) {
+		var counter = d.counters[key];
+		for (var i = 0; i < counter.length; i++) {
+			// true key is everything before first /
+			var trueKey = key.split("/")[0];
+			// the other segments are added as numbered tags t1/t2/t3
+			var tags = key.split("/").slice(1).map((x, i) => "t" + (i+1) + "=" + x).join(",");
+			lines.push(trueKey + "," + tags + " value=1 " + counter[i].unix() + "000000000");
+			// Yea looks good:
+			// tram,t1=4,t2=old value=1 1672700400000000
+			// tram,t1=4,t2=new value=1 1698402571000000
+			// tram,t1=4,t2=new value=1 1698403091000000
+		}
+	}
+	return lines.join("\n");
+}
+
+document.getElementById("export").addEventListener("click", () => {
+	triggerDownload(JSON.stringify(data), 'application/json', 'export.json');
+})
+
+document.getElementById("export-influxdb").addEventListener("click", () => {
+	triggerDownload(toInflux(data), 'text/plain', 'export.influx.txt');
 })
