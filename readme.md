@@ -1,4 +1,4 @@
-# SelfD
+# SelfD ![not dogfiod ready badge](https://img.shields.io/badge/dogfood_ready-no-red)
 
 statsd for urself
 
