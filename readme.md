@@ -1,6 +1,6 @@
-# Counters
+# SelfD
 
-statsd for yourself
+statsd for urself
 
 sometimes you just want to monitor some of those small one-off statistics and do so in a low friction way (e.g. "how many times did I see the old style tram on this line" or "what level of headache am i currently experiencing" or "please track my stool consistency") that one usually has to make a google form, for. And then you have to make graphs and it's a whole thing and you just wish it was more automatic.
 
