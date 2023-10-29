@@ -1,4 +1,5 @@
 const EXAMPLE_DATA = {
+	VERSION: 1,
 	counters: {
 		simple: {
 			"counter1": {
@@ -38,7 +39,7 @@ const EXAMPLE_DATA = {
 			unit: null,
 			min: 0,
 			max: 5,
-			increments: 0.5,
+			step: 0.5,
 			values: [
 				["2023-01-01T12:00:00.000Z", 4],
 				["2023-01-02T21:00:00.000Z", 0.5],
@@ -48,7 +49,7 @@ const EXAMPLE_DATA = {
 			unit: null,
 			min: 0,
 			max: 7,
-			increments: 1,
+			step: 1,
 			values: [
 				["2023-07-01T12:00:00.000Z", 4],
 				["2023-07-02T21:00:00.000Z", 3],
@@ -72,7 +73,7 @@ const EXAMPLE_DATA = {
 
 function loadData(){
 	let d = JSON.parse(localStorage.getItem("data"));
-	if (d == null) {
+	if (d === null) {
 		d = EXAMPLE_DATA;
 	}
 
@@ -102,35 +103,59 @@ function loadData(){
 }
 
 // Load the data from local storage
-let data = loadData();
+let data;
+data = loadData();
 
-// Hook up dialog buttons
+// Hook up dialog open buttons
 document.querySelectorAll("button[data-dialog]").forEach(button => {
 	button.addEventListener("click", (evt) => {
 		let dialog_id = evt.target.dataset.dialog
 		document.getElementById(dialog_id).showModal();
-
 	});
 })
 
+// Cancel buttons should close the dialog
 document.querySelectorAll("dialog button[data-action='cancel']").forEach(button => {
 	button.addEventListener("click", (evt) => {
-		let dialog_id = evt.target.dataset.dialog
-		document.getElementById(dialog_id).showModal();
-
+		evt.target.closest("dialog").close();
 	});
 })
 
-const saveButton = document.getElementById("add");
+// Confirm buttons will need more login.
+document.querySelectorAll("dialog button.confirm").forEach(button => {
+	button.addEventListener("click", (evt) => {
+		let dialog = evt.target.closest("dialog");
+		// Get form fields
+		let inputs = dialog.querySelectorAll("input, select");
+		let form = Object.fromEntries([...inputs].map(i => {
+			if(i.type == "checkbox"){
+				return [i.name, i.checked]
+			} else {
+				return [i.name, i.value || null]
+			}
+		}))
+		form.values = [];
 
-saveButton.addEventListener("click", () => {
-	// Get the data from the form
-	var key = document.getElementById("key").value;
-	var type = document.getElementById("type").value;
-	data[type][key] = [];
-	dialog.close();
-	saveData();
-});
+		// get type, the dialog's id without add-type-
+		let type = dialog.id.split("-").slice(2)[0] + 's';
+		if(type == "counters"){
+			if (form.simple) {
+				data[type].simple[form.key] = form;
+			} else {
+				data[type].complex[form.key] = form;
+			}
+		} else {
+			data[type][form.key] = form;
+		}
+		console.log(data);
+
+		inputs.forEach(i => i.value = "");
+		dialog.close();
+
+		saveData(data);
+		updateTables();
+	});
+})
 
 // Save the data to local storage
 function saveData() {
@@ -216,7 +241,7 @@ function updateTables(){
 
 		var row = makeRow([
 			key,
-			`${counter.values.slice(-1)[0][1]} ${counter.unit ? counter.unit : ""}`,
+			`${sum(counter.values.map(e => e[1]))} ${counter.unit ? counter.unit : ""}`,
 		]);
 
 		var c = document.createElement("div");
@@ -261,7 +286,7 @@ function updateTables(){
 
 		var row = makeRow([
 			key,
-			`${gauge.values.slice(-1)[0][1]} ${gauge.unit ? gauge.unit : ""}`,
+			`${gauge.values.length ? gauge.values.slice(-1)[0][1] : ""} ${gauge.unit ? gauge.unit : ""}`,
 		]);
 
 		var c = document.createElement("div");
@@ -273,6 +298,9 @@ function updateTables(){
 		}
 		if(gauge.max !== undefined){
 			input.setAttribute("max", gauge.max);
+		}
+		if(gauge.step !== undefined){
+			input.setAttribute("step", gauge.step);
 		}
 
 		button = document.createElement("button");
@@ -330,9 +358,12 @@ function updateTables(){
 updateTables();
 
 // When user changes the value, update the validation
-document.getElementById("key").addEventListener("input", function(e) {
-	// set aria-invalid="true" if the input is invalid, and set an appropriate error message
-	e.target.setAttribute('aria-invalid', e.target.value.length == 0);
+document.querySelectorAll("input[required]").forEach(i => {
+	console.log(i)
+	i.addEventListener("input", function(e) {
+		// set aria-invalid="true" if the input is invalid, and set an appropriate error message
+		e.target.setAttribute('aria-invalid', e.target.value.length == 0);
+	});
 });
 
 function triggerDownload(contents, type, filename){

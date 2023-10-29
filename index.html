@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>Home</title>
+		<title>SelfD</title>
 
 		<meta charset="utf-8">
 
@@ -16,7 +16,6 @@
 		<meta name="application-name" content="Counter">
 
 		<link rel="manifest" href="manifest.json">
-		<title>Counter</title>
 		<script src="moment.min.js"></script>
 	</head>
 	<body>
@@ -26,8 +25,7 @@
 					<li><hgroup><h1>SelfD</h1><p>Like StatsD for urself</p></hgroup></li>
 				</ul>
 				<ul>
-					<li><button role="button" data-dialog="add-new">+ Add New</button></li>
-					<li><button role="button" data-dialog="graph-it">Graph It</button></li>
+					<li><button role="button" data-dialog="graph-it" disabled>Graph It</button></li>
 				</ul>
 			</nav>
 			<!-- <hgroup> -->
@@ -38,7 +36,10 @@
 
 		<main>
 			<article>
-			<h2>Counters</h2>
+				<div class="card-header">
+					<h2>Counters</h2>
+					<button role="button" data-dialog="add-new-counter">+</button>
+				</div>
 			<table id="counters" role='grid'>
 				<thead>
 					<tr>
@@ -53,7 +54,10 @@
 			</article>
 
 			<article>
-			<h2>Gauges</h2>
+				<div class="card-header">
+					<h2>Gauges</h2>
+					<button role="button" data-dialog="add-new-gauge">+</button>
+				</div>
 			<table id="gauges" role='grid'>
 				<thead>
 					<tr>
@@ -68,7 +72,10 @@
 			</article>
 
 			<article>
-			<h2>Timers</h2>
+				<div class="card-header">
+					<h2>Timers</h2>
+					<button role="button" data-dialog="add-new-timer">+</button>
+				</div>
 			<table id="timers" role='grid'>
 				<thead>
 					<tr>
@@ -101,28 +108,78 @@
 		</footer>
 
 	</body>
-	<dialog id="add-new">
+	<dialog id="add-new-counter">
 		<article>
 			<header>
 				Add a new counter
 			</header>
 			<form method="dialog">
-				<label for="type">
-					Type
-					<select id="type" name="type" required aria-invalid="false">
-						<option value="counters">Counter</option>
-						<option value="gauges">Gauge</option>
-					</select>
-				</label>
-
 				<label for="key">
 					Counter Name
+					<input type="text" name="key" placeholder="some.value" required aria-invalid="true">
+				</label>
+				<label for="simple">
+					Simple
+					<input type="checkbox" name="simple" checked>
+				</label>
+				<label for="unit">
+					Unit
+					<input type="text" name="unit" placeholder="e.g. ms or mL (optional)">
+				</label>
+			</form>
+			<footer>
+				<button data-action="cancel" class="secondary">Cancel</button>
+				<button class="confirm">Confirm</button>
+			</footer>
+		</article>
+	</dialog>
+	<dialog id="add-new-gauge">
+		<article>
+			<header>
+				Add a new gauge
+			</header>
+			<form method="dialog">
+				<label for="key">
+					Gauge Name
+					<input type="text" name="key" placeholder="some.value" required aria-invalid="true">
+				</label>
+				<label for="unit">
+					Unit
+					<input type="text" name="unit" placeholder="e.g. ms or mL (optional)">
+				</label>
+				<label for="min">
+					Min
+					<input type="number" name="min" placeholder="e.g. 0 (optional)">
+				</label>
+				<label for="max">
+					Max
+					<input type="number" name="max" placeholder="e.g. 100 (optional)">
+				</label>
+				<label for="increment">
+					Increment
+					<input type="number" name="increment" placeholder="e.g. 1 (optional)">
+				</label>
+			</form>
+			<footer>
+				<button data-action="cancel" class="secondary">Cancel</button>
+				<button class="confirm">Confirm</button>
+			</footer>
+		</article>
+	</dialog>
+	<dialog id="add-new-timer">
+		<article>
+			<header>
+				Add a new timer
+			</header>
+			<form method="dialog">
+				<label for="key">
+					Timer Name
 					<input type="text" id="key" name="key" placeholder="some.value" required aria-invalid="true">
 				</label>
 			</form>
 			<footer>
 				<button data-action="cancel" class="secondary">Cancel</button>
-				<button id="add">Confirm</button>
+				<button class="confirm">Confirm</button>
 			</footer>
 		</article>
 	</dialog>

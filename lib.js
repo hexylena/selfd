@@ -16,6 +16,10 @@ function makeRow(elements){
 	return row;
 }
 
+function sum(arr){
+	return arr.reduce((partialSum, a) => partialSum + a, 0);
+}
+
 if ('serviceWorker' in navigator) {
 	navigator.serviceWorker.register('service-worker.js');
 }
