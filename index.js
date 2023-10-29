@@ -303,7 +303,6 @@ function updateTables(){
 
 		var button = document.createElement("button");
 		button.dataset.key = key;
-		console.log(timer);
 		if(timer.values.length > 0 && !timer.values.slice(-1)[0].end.isValid()){
 			button.innerHTML = `End (Running since ${timer.values.slice(-1)[0].start.fromNow()})`;
 		} else {
@@ -344,21 +343,58 @@ function triggerDownload(contents, type, filename){
 function toInflux(d){
 	// myMeasurement,tag1=value1,tag2=value2 fieldKey="fieldValue" 1556813561098000000
 	var lines = [];
-	for (var key in d.counters) {
-		var counter = d.counters[key];
-		for (var i = 0; i < counter.length; i++) {
+	for (var key in d.counters.simple) {
+		var counter = d.counters.simple[key];
+		console.log(key, lines, counter);
+		for (var i = 0; i < counter.values.length; i++) {
 			// true key is everything before first /
 			var trueKey = key.split("/")[0];
 			// the other segments are added as numbered tags t1/t2/t3
-			var tags = key.split("/").slice(1).map((x, i) => "t" + (i+1) + "=" + x).join(",");
-			lines.push(trueKey + "," + tags + " value=1 " + counter[i].unix() + "000000000");
+			var tags = key.split("/").slice(1).map((x, i) => "t" + (i+1) + "=" + x);
+			tags.push("type=counter");
+			if(counter.unit){
+				tags.push("unit=" + counter.unit);
+			}
+			lines.push(trueKey + "," + tags.join(",") + " value=1 " + counter.values[i].unix() + "000000000");
 			// Yea looks good:
 			// tram,t1=4,t2=old value=1 1672700400000000
 			// tram,t1=4,t2=new value=1 1698402571000000
 			// tram,t1=4,t2=new value=1 1698403091000000
 		}
 	}
-	return lines.join("\n");
+
+	for (var key in d.counters.complex) {
+		var counter = d.counters.complex[key];
+		console.log(key, lines, counter);
+		for (var i = 0; i < counter.values.length; i++) {
+			// true key is everything before first /
+			var trueKey = key.split("/")[0];
+			// the other segments are added as numbered tags t1/t2/t3
+			var tags = key.split("/").slice(1).map((x, i) => "t" + (i+1) + "=" + x);
+			tags.push("type=counter");
+			if(counter.unit){
+				tags.push("unit=" + counter.unit);
+			}
+			lines.push(trueKey + "," + tags.join(",") + ` value=${counter.values[i][1]} ` + counter.values[i][0].unix() + "000000000");
+		}
+	}
+
+	for (var key in d.gauges) {
+		var gauge = d.gauges[key];
+		console.log(key, lines, gauge);
+		for (var i = 0; i < gauge.values.length; i++) {
+			// true key is everything before first /
+			var trueKey = key.split("/")[0];
+			// the other segments are added as numbered tags t1/t2/t3
+			var tags = key.split("/").slice(1).map((x, i) => "t" + (i+1) + "=" + x);
+			tags.push("type=gauge");
+			if(gauge.unit){
+				tags.push("unit=" + gauge.unit);
+			}
+			lines.push(trueKey + "," + tags.join(",") + ` value=${gauge.values[i][1]} ` + gauge.values[i][0].unix() + "000000000");
+		}
+	}
+	return lines
 }
 
 document.getElementById("export").addEventListener("click", () => {
@@ -366,5 +402,5 @@ document.getElementById("export").addEventListener("click", () => {
 })
 
 document.getElementById("export-influxdb").addEventListener("click", () => {
-	triggerDownload(toInflux(data), 'text/plain', 'export.influx.txt');
+	triggerDownload(toInflux(data).join("\n"), 'text/plain', 'export.influx.txt');
 })

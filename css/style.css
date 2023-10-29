@@ -88,6 +88,9 @@ table tr.subheader td {
 	text-align: center;
 }
 
-.complex-input {
-	display: flex;
+@media (min-width: 900px) {
+	.complex-input {
+		display: flex;
+	}
 }
+
