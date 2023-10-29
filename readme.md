@@ -42,6 +42,14 @@ it'll be relatively automation free ofc.
 - [x] +N dialog
 - [x] version the data even if not supporting migrations yet
 - [x] a11y testing (esp for mutable values, dialogs)
+- [ ] error checking (null names)
+- [ ] validate gauge entry
+- [ ] suggest using /
+- [ ] compact mode, only buttons + inputs with small (+) button
+- [ ] bulk add with templating
+- [ ] remove values
+- [ ] padding on export import buttons
+- [ ] settings dialogue? (compact mode, non 90s theme?)
 - [ ] undo!!!
 - [ ] graphs
 
