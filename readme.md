@@ -48,6 +48,7 @@ it'll be relatively automation free ofc.
 - [ ] compact mode, only buttons + inputs with small (+) button
 - [ ] bulk add with templating
 - [ ] remove values
+- [ ] sort table by key name
 - [ ] padding on export import buttons
 - [ ] settings dialogue? (compact mode, non 90s theme?)
 - [ ] undo!!!
