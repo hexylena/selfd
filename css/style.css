@@ -19,6 +19,8 @@ body {
 
 body {
 	--primary: #89aee1 !important;
+	--background: #7cf4d3 !important;
+	--header: #9effb8 !important;
 	--muted-color: #000 !important; /* for my colour issues */
 	--color: #000 !important;
 }
@@ -26,6 +28,8 @@ body {
 	body {
 		--primary: #89aee1 !important;
 		--muted-color: #fff !important; /* for my colour issues */
+		--background: #1d483c !important;
+		--header: #003e11 !important;
 		--color: #fff !important;
 		background-color: #1d483c;
 	}
@@ -36,8 +40,8 @@ body {
 
 
 article {
-	box-shadow: 8px 8px var(--contrast);
-	border: 2px solid var(--contrast);
+	box-shadow: 8px 8px black;
+	border: 2px solid black;
 	border-radius: 0;
 }
 
@@ -48,8 +52,8 @@ header nav {
 button {
 	color: black !important;
 	background: #e9f259 !important;
-	box-shadow: 4px 4px var(--contrast) !important;
-	border: 2px solid var(--contrast) !important;
+	box-shadow: 4px 4px black !important;
+	border: 2px solid black !important;
 	border-radius: 30px !important;
 }
 button:hover {
@@ -58,15 +62,15 @@ button:hover {
 }
 
 nav {
-	background: #9effb8;
-	box-shadow: 8px 8px var(--contrast);
-	border: 2px solid var(--contrast);
+	background: var(--header);
+	box-shadow: 8px 8px black;
+	border: 2px solid black;
 	border-radius: 0;
 	padding: 0.5em;
 }
 footer nav {
 	color: black !important;
-	background: #d46ce7;
+	background: var(--header);
 	/* ,,,, */
 }
 
@@ -77,7 +81,7 @@ a {
 }
 
 table tr.subheader {
-	background: #9effb8;
+	background: var(--header);
 	border: 4px dashed black;
 }
 table tr.subheader td {
