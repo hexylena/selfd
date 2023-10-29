@@ -182,7 +182,10 @@ function updateTables(){
 	for (var key in data.counters.simple) {
 		var counter = data.counters.simple[key];
 
-		var row = makeRow([key, counter.values.length]);
+		var row = makeRow([
+			key,
+			`${counter.values.length} ${counter.unit ? counter.unit : ""}`,
+		]);
 		button = document.createElement("button");
 		button.dataset.key = key;
 		if(counter.values.length > 0){
@@ -207,7 +210,10 @@ function updateTables(){
 	for (var key in data.counters.complex) {
 		var counter = data.counters.complex[key];
 
-		var row = makeRow([key, counter.values.slice(-1)[0][1]]);
+		var row = makeRow([
+			key,
+			`${counter.values.slice(-1)[0][1]} ${counter.unit ? counter.unit : ""}`,
+		]);
 
 		var c = document.createElement("div");
 		c.setAttribute("class", "complex-input");
@@ -247,26 +253,29 @@ function updateTables(){
 	const gaugestable = document.querySelector("#gauges tbody")
 	gaugestable.innerHTML = "";
 	for (var key in data.gauges) {
-		var gauges = data.gauges[key];
+		var gauge = data.gauges[key];
 
-		var row = makeRow([key, gauges.values.slice(-1)[0][1]]);
+		var row = makeRow([
+			key,
+			`${gauge.values.slice(-1)[0][1]} ${gauge.unit ? gauge.unit : ""}`,
+		]);
 
 		var c = document.createElement("div");
 		c.setAttribute("class", "complex-input");
 		input = document.createElement("input"); // numeric
 		input.setAttribute("type", "number");
-		if(gauges.min !== undefined){
-			input.setAttribute("min", gauges.min);
+		if(gauge.min !== undefined){
+			input.setAttribute("min", gauge.min);
 		}
-		if(gauges.max !== undefined){
-			input.setAttribute("max", gauges.max);
+		if(gauge.max !== undefined){
+			input.setAttribute("max", gauge.max);
 		}
 
 		button = document.createElement("button");
 		button.disabled = true;
 		button.dataset.key = key;
-		if(gauges.values.length > 0){
-			button.innerHTML = gauges.values.slice(-1)[0][0].fromNow()
+		if(gauge.values.length > 0){
+			button.innerHTML = gauge.values.slice(-1)[0][0].fromNow()
 		} else {
 			button.innerHTML = "Never";
 		}
