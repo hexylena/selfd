@@ -75,9 +75,10 @@ const EXAMPLE_DATA = {
 function loadData(){
 	let d = JSON.parse(localStorage.getItem("data"));
 
-	if (d.VERSION != APP_DATA_VERSION) {
-		alert("Data version mismatch. Triggering a download of your data.");
-		triggerDownload(JSON.stringify(data), 'application/json', 'export.json');
+	if (d.VERSION !== null && d.VERSION !== undefined && d.VERSION != APP_DATA_VERSION) {
+		if(confirm("Data version mismatch. Triggering a download of your data. Accept to download a copy of your data.")){
+			triggerDownload(JSON.stringify(data), 'application/json', 'export.json');
+		}
 	}
 
 	if (d === null) {
@@ -154,7 +155,6 @@ document.querySelectorAll("dialog button.confirm").forEach(button => {
 		} else {
 			data[type][form.key] = form;
 		}
-		console.log(data);
 
 		inputs.forEach(i => i.value = "");
 		dialog.close();
@@ -366,7 +366,7 @@ updateTables();
 
 // When user changes the value, update the validation
 document.querySelectorAll("input[required]").forEach(i => {
-	console.log(i)
+	i.setAttribute('aria-invalid', true);
 	i.addEventListener("input", function(e) {
 		// set aria-invalid="true" if the input is invalid, and set an appropriate error message
 		e.target.setAttribute('aria-invalid', e.target.value.length == 0);
@@ -387,7 +387,6 @@ function toInflux(d){
 	var lines = [];
 	for (var key in d.counters.simple) {
 		var counter = d.counters.simple[key];
-		console.log(key, lines, counter);
 		for (var i = 0; i < counter.values.length; i++) {
 			// true key is everything before first /
 			var trueKey = key.split("/")[0];
@@ -407,7 +406,6 @@ function toInflux(d){
 
 	for (var key in d.counters.complex) {
 		var counter = d.counters.complex[key];
-		console.log(key, lines, counter);
 		for (var i = 0; i < counter.values.length; i++) {
 			// true key is everything before first /
 			var trueKey = key.split("/")[0];
@@ -423,7 +421,6 @@ function toInflux(d){
 
 	for (var key in d.gauges) {
 		var gauge = d.gauges[key];
-		console.log(key, lines, gauge);
 		for (var i = 0; i < gauge.values.length; i++) {
 			// true key is everything before first /
 			var trueKey = key.split("/")[0];
