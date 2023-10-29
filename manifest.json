@@ -1,0 +1,26 @@
+{
+  "background_color": "#7cf4d3",
+  "description": "statsd for urself",
+  "display": "standalone",
+  "name": "SelfD",
+  "scope": "/selfd/",
+  "short_name": "SelfD",
+  "icons": [
+    {
+      "src": "/selfd/assets/512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "/selfd/assets/192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/selfd/assets/logo.svg",
+      "sizes": "any"
+    }
+  ],
+  "start_url": "/selfd/",
+  "theme_color": "#e9f259"
+}

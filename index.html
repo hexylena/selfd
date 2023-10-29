@@ -5,17 +5,17 @@
 		<meta charset="utf-8">
 
 		<link rel="stylesheet" href="css/pico.fluid.classless.min.css">
-		<link rel="stylesheet" href="css/charts.css-1.1.0/dist/charts.css">
 		<link rel="stylesheet" href="css/style.css">
 
 		<meta name="viewport" content="width=device-width,initial-scale=1">
 
-		<meta name="theme-color" content="#11191f">
+		<meta name="theme-color" content="#e9f259">
 		<meta name="mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="default">
-		<link rel="manifest" href="site.webmanifest">
 		<meta name="application-name" content="Counter">
+
+		<link rel="manifest" href="manifest.json">
 		<title>Counter</title>
 		<script src="moment.min.js"></script>
 	</head>
@@ -52,20 +52,35 @@
 			</table>
 			</article>
 
-			<!--
+			<article>
 			<h2>Gauges</h2>
 			<table id="gauges" role='grid'>
 				<thead>
 					<tr>
 						<th scope="col">Key</th>
-						<th scope="col">Value</th>
+						<th scope="col">Last Value</th>
 						<th scope="col">Last Updated</th>
 					</tr>
 				</thead>
 				<tbody>
 				</tbody>
 			</table>
-			-->
+			</article>
+
+			<article>
+			<h2>Timers</h2>
+			<table id="timers" role='grid'>
+				<thead>
+					<tr>
+						<th scope="col">Key</th>
+						<th scope="col">Interval Count</th>
+						<th scope="col">Last Updated</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+			</article>
 
 		</main>
 		<footer>
@@ -162,5 +177,6 @@
 			</footer>
 		</article>
 	</dialog>
+	<script src="lib.js"></script>
 	<script src="index.js"></script>
 </html>

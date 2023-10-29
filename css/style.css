@@ -75,3 +75,15 @@ footer nav {
 a {
 	text-decoration: underline;
 }
+
+table tr.subheader {
+	background: #9effb8;
+	border: 4px dashed black;
+}
+table tr.subheader td {
+	text-align: center;
+}
+
+.complex-input {
+	display: flex;
+}

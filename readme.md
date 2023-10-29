@@ -37,11 +37,14 @@ it'll be relatively automation free ofc.
 
 ## todo
 
-- [ ] units
-- [ ] gauge, timer
-- [ ] +N dialog
+- [x] units
+- [x] gauge, timer
+- [x] +N dialog
 - [ ] undo!!!
 - [ ] version the data even if not supporting migrations yet
+- [ ] a11y testing (esp for mutable values, dialogs)
+- [ ] add element dialog improvements
+- [ ] graphs
 
 ## graphing plan
 
@@ -54,7 +57,7 @@ also want a calendar view
 
 there is none.
 
-would be nice tho since otherwise you have to back it up. i don't want to run a KV store, and then we need encryption to make sure I cant see it. 
+would be nice tho since otherwise you have to back it up. i don't want to run a KV store, and then we need encryption to make sure I cant see it? reccies welcome.
 
 ## LICENSE
 

@@ -3,20 +3,98 @@ function loadData(){
 	if (d == null) {
 		d = {
 			counters: {
-				"counter1": ["2023-01-01T12:00:00.000Z", "2023-01-02T21:00:00.000Z", "2023-01-03T18:00:00.000Z"],
-				"tram/4/old": ["2023-01-03T00:00:00.000Z"],
-				"tram/4/new": [],
+				simple: {
+					"counter1": {
+						unit: null,
+						values: ["2023-01-01T12:00:00.000Z", "2023-01-02T21:00:00.000Z", "2023-01-03T18:00:00.000Z"],
+					},
+					"tram/4/old": {
+						unit: null,
+						values: ["2023-01-03T00:00:00.000Z"],
+					},
+					"tram/4/new": {
+						unit: null,
+						values: []
+					},
+				},
+				complex: {
+					"drinkjes/40%abv": {
+						unit: 'mL',
+						min: 0,
+						values: [
+							["2023-02-01T12:00:00.000Z", 100],
+							["2023-02-02T21:00:00.000Z", 90],
+						]
+					},
+					"drinkjes/14%abv": {
+						unit: 'mL',
+						min: 0,
+						values: [
+							["2023-01-01T12:00:00.000Z", 100],
+							["2023-01-02T21:00:00.000Z", 90],
+						]
+					}
+				}
 			},
 			gauges: {
+				"pain/head": {
+					unit: null,
+					min: 0,
+					max: 5,
+					increments: 0.5,
+					values: [
+						["2023-01-01T12:00:00.000Z", 4],
+						["2023-01-02T21:00:00.000Z", 0.5],
+					]
+				},
+				"mh/anxiety": {
+					unit: null,
+					min: 0,
+					max: 7,
+					increments: 1,
+					values: [
+						["2023-07-01T12:00:00.000Z", 4],
+						["2023-07-02T21:00:00.000Z", 3],
+					]
+				}
+			},
+			timers: {
+				"period": {
+					values: [
+						{start: "2023-01-01T12:00:00.000Z", end: "2023-01-05T12:00:00.000Z"},
+						{start: "2023-08-01T12:00:00.000Z", end: null},
+					]
+				},
+				"other": {
+					values: [
+						{start: "2023-01-01T12:00:00.000Z", end: "2023-01-05T12:00:00.000Z"},
+					]
+				}
 			}
-		};
-	}
-	// Convert all datapoints to momentjs
-	for (var key in d.counters) {
-		var counter = d.counters[key];
-		for (var i = 0; i < counter.length; i++) {
-			counter[i] = moment(counter[i]);
 		}
+	}
+
+	// Convert all datapoints to momentjs
+	for (var key in d.counters.simple) {
+		d.counters.simple[key].values.forEach((v, i) => {
+			d.counters.simple[key].values[i] = moment(v);
+		});
+	}
+	for (var key in d.counters.complex) {
+		d.counters.complex[key].values.forEach((v, i) => {
+			d.counters.complex[key].values[i] = [moment(v[0]), v[1]];
+		});
+	}
+	for (var key in d.gauges) {
+		d.gauges[key].values.forEach((v, i) => {
+			d.gauges[key].values[i] = [moment(v[0]), v[1]];
+		});
+	}
+	for (var key in d.timers) {
+		d.timers[key].values.forEach((v, i) => {
+			d.timers[key].values[i].start = moment(v.start);
+			d.timers[key].values[i].end = moment(v.end);
+		});
 	}
 	return d;
 }
@@ -58,45 +136,183 @@ function saveData() {
 	updateTables();
 }
 
-function incrementCounter(key){
-	data.counters[key].push(moment());
+function incrementCounterSimple(key){
+	data.counters.simple[key].values.push(moment());
 	updateTables();
 	saveData();
 }
 
+function incrementCounterComplex(key, val){
+	data.counters.complex[key].values.push([
+		moment(),
+		parseInt(val)
+	]);
+	updateTables();
+	saveData();
+}
+
+function setGauge(key, val){
+	data.gauges[key].values.push([
+		moment(),
+		parseInt(val)
+	]);
+	updateTables();
+	saveData();
+}
+
+function toggleTimer(key){
+	var timer = data.timers[key];
+	if(timer.values.length == 0 || timer.values.slice(-1)[0].end.isValid()){
+		timer.values.push({
+			start: moment(),
+			end: moment(null), // intentional
+		});
+	} else {
+		timer.values.slice(-1)[0].end = moment();
+	}
+	updateTables();
+	saveData();
+}
+
+
 function updateTables(){
 	// For each counter, load into the table #counters
-	document.querySelector("#counters tbody").innerHTML = "";
-	for (var key in data.counters) {
-		var counter = data.counters[key];
-		var row = document.createElement("tr");
+	const countertable = document.querySelector("#counters tbody")
+	countertable.innerHTML = "";
+	for (var key in data.counters.simple) {
+		var counter = data.counters.simple[key];
 
-		var cell = document.createElement("td");
-		cell.innerHTML = key;
-		row.appendChild(cell);
-
-		cell = document.createElement("td");
-		cell.innerHTML = counter.length;
-		row.appendChild(cell);
-
-		cell = document.createElement("td");
+		var row = makeRow([key, counter.values.length]);
 		button = document.createElement("button");
 		button.dataset.key = key;
-		if(counter.length > 0){
-			console.log(counter.slice(-1)[0].format('lll'))
-			button.innerHTML = counter.slice(-1)[0].fromNow();
+		if(counter.values.length > 0){
+			button.innerHTML = counter.values.slice(-1)[0].fromNow();
 		} else {
 			button.innerHTML = "Never";
 		}
 		button.addEventListener("click", (e) => {
-			incrementCounter(e.target.dataset.key);
+			incrementCounterSimple(e.target.dataset.key);
 		});
 
-		cell.appendChild(button);
-		row.appendChild(cell);
+		addElementToRow(row, button);
 
-		document.querySelector("#counters tbody").appendChild(row);
+		countertable.appendChild(row);
 	}
+
+	var subheader = document.createElement("tr");
+	subheader.setAttribute("class", "subheader");
+	subheader.innerHTML = "<td colspan='3'>Complex counters</td>";
+	countertable.appendChild(subheader);
+
+	for (var key in data.counters.complex) {
+		var counter = data.counters.complex[key];
+
+		var row = makeRow([key, counter.values.slice(-1)[0][1]]);
+
+		var c = document.createElement("div");
+		c.setAttribute("class", "complex-input");
+		input = document.createElement("input"); // numeric
+		input.setAttribute("type", "number");
+		if(counter.min !== undefined){
+			input.setAttribute("min", counter.min);
+		}
+		if(counter.max !== undefined){
+			input.setAttribute("max", counter.max);
+		}
+
+		button = document.createElement("button");
+		button.disabled = true;
+		button.dataset.key = key;
+		if(counter.values.length > 0){
+			button.innerHTML = counter.values.slice(-1)[0][0].fromNow()
+		} else {
+			button.innerHTML = "Never";
+		}
+		input.addEventListener("input", (e) => {
+			// enable the button
+			e.target.nextSibling.disabled = false;
+		});
+		button.addEventListener("click", (e) => {
+			incrementCounterComplex(e.target.dataset.key, e.target.previousSibling.value);
+		});
+		c.appendChild(input);
+		c.appendChild(button);
+
+		addElementToRow(row, c);
+
+		countertable.appendChild(row);
+	}
+
+	// Gauges
+	const gaugestable = document.querySelector("#gauges tbody")
+	gaugestable.innerHTML = "";
+	for (var key in data.gauges) {
+		var gauges = data.gauges[key];
+
+		var row = makeRow([key, gauges.values.slice(-1)[0][1]]);
+
+		var c = document.createElement("div");
+		c.setAttribute("class", "complex-input");
+		input = document.createElement("input"); // numeric
+		input.setAttribute("type", "number");
+		if(gauges.min !== undefined){
+			input.setAttribute("min", gauges.min);
+		}
+		if(gauges.max !== undefined){
+			input.setAttribute("max", gauges.max);
+		}
+
+		button = document.createElement("button");
+		button.disabled = true;
+		button.dataset.key = key;
+		if(gauges.values.length > 0){
+			button.innerHTML = gauges.values.slice(-1)[0][0].fromNow()
+		} else {
+			button.innerHTML = "Never";
+		}
+		input.addEventListener("input", (e) => {
+			// enable the button
+			e.target.nextSibling.disabled = false;
+		});
+		button.addEventListener("click", (e) => {
+			setGauge(e.target.dataset.key, e.target.previousSibling.value);
+		});
+		c.appendChild(input);
+		c.appendChild(button);
+
+		addElementToRow(row, c);
+
+		gaugestable.appendChild(row);
+	}
+
+	// timers
+	const timerstable = document.querySelector("#timers tbody")
+	timerstable.innerHTML = "";
+	for (var key in data.timers) {
+		var timer = data.timers[key];
+		var row = makeRow([key, timer.values.length]);
+
+		var button = document.createElement("button");
+		button.dataset.key = key;
+		console.log(timer);
+		if(timer.values.length > 0 && !timer.values.slice(-1)[0].end.isValid()){
+			button.innerHTML = `End (Running since ${timer.values.slice(-1)[0].start.fromNow()})`;
+		} else {
+			button.innerHTML = "Start";
+		}
+		input.addEventListener("input", (e) => {
+			// enable the button
+			e.target.nextSibling.disabled = false;
+		});
+		button.addEventListener("click", (e) => {
+			toggleTimer(e.target.dataset.key);
+		});
+		addElementToRow(row, button);
+
+		timerstable.appendChild(row);
+	}
+
+
 }
 
 updateTables();
