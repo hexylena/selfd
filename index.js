@@ -75,7 +75,7 @@ const EXAMPLE_DATA = {
 function loadData(){
 	let d = JSON.parse(localStorage.getItem("data"));
 
-	if (d.VERSION !== null && d.VERSION !== undefined && d.VERSION != APP_DATA_VERSION) {
+	if (d !== null && d.VERSION !== null && d.VERSION !== undefined && d.VERSION != APP_DATA_VERSION) {
 		if(confirm("Data version mismatch. Triggering a download of your data. Accept to download a copy of your data.")){
 			triggerDownload(JSON.stringify(data), 'application/json', 'export.json');
 		}
