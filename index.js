@@ -1,77 +1,79 @@
-function loadData(){
-	var d = JSON.parse(localStorage.getItem("data"));
-	if (d == null) {
-		d = {
-			counters: {
-				simple: {
-					"counter1": {
-						unit: null,
-						values: ["2023-01-01T12:00:00.000Z", "2023-01-02T21:00:00.000Z", "2023-01-03T18:00:00.000Z"],
-					},
-					"tram/4/old": {
-						unit: null,
-						values: ["2023-01-03T00:00:00.000Z"],
-					},
-					"tram/4/new": {
-						unit: null,
-						values: []
-					},
-				},
-				complex: {
-					"drinkjes/40%abv": {
-						unit: 'mL',
-						min: 0,
-						values: [
-							["2023-02-01T12:00:00.000Z", 100],
-							["2023-02-02T21:00:00.000Z", 90],
-						]
-					},
-					"drinkjes/14%abv": {
-						unit: 'mL',
-						min: 0,
-						values: [
-							["2023-01-01T12:00:00.000Z", 100],
-							["2023-01-02T21:00:00.000Z", 90],
-						]
-					}
-				}
+const EXAMPLE_DATA = {
+	counters: {
+		simple: {
+			"counter1": {
+				unit: null,
+				values: ["2023-01-01T12:00:00.000Z", "2023-01-02T21:00:00.000Z", "2023-01-03T18:00:00.000Z"],
 			},
-			gauges: {
-				"pain/head": {
-					unit: null,
-					min: 0,
-					max: 5,
-					increments: 0.5,
-					values: [
-						["2023-01-01T12:00:00.000Z", 4],
-						["2023-01-02T21:00:00.000Z", 0.5],
-					]
-				},
-				"mh/anxiety": {
-					unit: null,
-					min: 0,
-					max: 7,
-					increments: 1,
-					values: [
-						["2023-07-01T12:00:00.000Z", 4],
-						["2023-07-02T21:00:00.000Z", 3],
-					]
-				}
+			"tram/4/old": {
+				unit: null,
+				values: ["2023-01-03T00:00:00.000Z"],
 			},
-			timers: {
-				"period": {
-					values: [
-						{start: "2023-01-01T12:00:00.000Z", end: "2023-01-05T12:00:00.000Z"},
-						{start: "2023-08-01T12:00:00.000Z", end: null},
-					]
-				},
-				"other": {
-					values: [
-						{start: "2023-01-01T12:00:00.000Z", end: "2023-01-05T12:00:00.000Z"},
-					]
-				}
+			"tram/4/new": {
+				unit: null,
+				values: []
+			},
+		},
+		complex: {
+			"drinkjes/40%abv": {
+				unit: 'mL',
+				min: 0,
+				values: [
+					["2023-02-01T12:00:00.000Z", 100],
+					["2023-02-02T21:00:00.000Z", 90],
+				]
+			},
+			"drinkjes/14%abv": {
+				unit: 'mL',
+				min: 0,
+				values: [
+					["2023-01-01T12:00:00.000Z", 100],
+					["2023-01-02T21:00:00.000Z", 90],
+				]
 			}
 		}
+	},
+	gauges: {
+		"pain/head": {
+			unit: null,
+			min: 0,
+			max: 5,
+			increments: 0.5,
+			values: [
+				["2023-01-01T12:00:00.000Z", 4],
+				["2023-01-02T21:00:00.000Z", 0.5],
+			]
+		},
+		"mh/anxiety": {
+			unit: null,
+			min: 0,
+			max: 7,
+			increments: 1,
+			values: [
+				["2023-07-01T12:00:00.000Z", 4],
+				["2023-07-02T21:00:00.000Z", 3],
+			]
+		}
+	},
+	timers: {
+		"period": {
+			values: [
+				{start: "2023-01-01T12:00:00.000Z", end: "2023-01-05T12:00:00.000Z"},
+				{start: "2023-08-01T12:00:00.000Z", end: null},
+			]
+		},
+		"other": {
+			values: [
+				{start: "2023-01-01T12:00:00.000Z", end: "2023-01-05T12:00:00.000Z"},
+			]
+		}
+	}
+}
+
+function loadData(){
+	let d = JSON.parse(localStorage.getItem("data"));
+	if (d == null) {
+		d = EXAMPLE_DATA;
 	}
 
 	// Convert all datapoints to momentjs
@@ -202,10 +204,12 @@ function updateTables(){
 		countertable.appendChild(row);
 	}
 
-	var subheader = document.createElement("tr");
-	subheader.setAttribute("class", "subheader");
-	subheader.innerHTML = "<td colspan='3'>Complex counters</td>";
-	countertable.appendChild(subheader);
+	if (Object.keys(data.counters.complex).length > 0) {
+		var subheader = document.createElement("tr");
+		subheader.setAttribute("class", "subheader");
+		subheader.innerHTML = "<td colspan='3'>Complex counters</td>";
+		countertable.appendChild(subheader);
+	}
 
 	for (var key in data.counters.complex) {
 		var counter = data.counters.complex[key];
@@ -403,4 +407,25 @@ document.getElementById("export").addEventListener("click", () => {
 
 document.getElementById("export-influxdb").addEventListener("click", () => {
 	triggerDownload(toInflux(data).join("\n"), 'text/plain', 'export.influx.txt');
+})
+
+document.getElementById("reset").addEventListener("click", () => {
+	if(confirm("Are you sure you want to reset to the example data?")){
+		localStorage.clear();
+		data = loadData();
+		updateTables();
+	}
+})
+
+document.getElementById("clear-example").addEventListener("click", () => {
+	if(confirm("Are you sure you want to clear all data?")){
+		data = EXAMPLE_DATA;
+		data.counters.simple = {};
+		data.counters.complex = {};
+		data.gauges = {};
+		data.timers = {};
+
+		saveData(data);
+		updateTables();
+	}
 })
