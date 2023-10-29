@@ -1,3 +1,4 @@
+const APP_DATA_VERSION = 1;
 const EXAMPLE_DATA = {
 	VERSION: 1,
 	counters: {
@@ -73,6 +74,12 @@ const EXAMPLE_DATA = {
 
 function loadData(){
 	let d = JSON.parse(localStorage.getItem("data"));
+
+	if (d.VERSION != APP_DATA_VERSION) {
+		alert("Data version mismatch. Triggering a download of your data.");
+		triggerDownload(JSON.stringify(data), 'application/json', 'export.json');
+	}
+
 	if (d === null) {
 		d = EXAMPLE_DATA;
 	}

@@ -41,9 +41,9 @@ it'll be relatively automation free ofc.
 - [x] gauge, timer
 - [x] +N dialog
 - [ ] undo!!!
-- [ ] version the data even if not supporting migrations yet
+- [x] version the data even if not supporting migrations yet
 - [ ] a11y testing (esp for mutable values, dialogs)
-- [ ] add element dialog improvements
+- [ ] add element dialog improvements (wtf does this mean?)
 - [ ] graphs
 
 ## graphing plan
