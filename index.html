@@ -18,6 +18,7 @@
 		<meta name="application-name" content="Counter">
 
 		<link rel="manifest" href="manifest.json">
+		<script src="https://js.sentry-cdn.com/83b4d2a305171fbf3bd9567c60620716.min.js" crossorigin="anonymous"></script>
 	</head>
 	<body>
 		<header>
@@ -36,6 +37,18 @@
 		</header>
 
 		<main>
+			<article>
+				<h2>About</h2>
+				<p style="background: red">
+				Warning: this version includes sentry tracing until I figure out what i did wrong.
+				</p>
+				<p>
+				StatsD is a network daemon that listens for metrics, like counters and timers, and sends aggregates to one or more pluggable backend services (e.g., <a href="https://graphiteapp.org/">Graphite</a>).
+				</p>
+				<p>
+				This isn't that. It's like that but for yourself. So it's just stored within your browser's localStorage.
+				</p>
+			</article>
 			<article>
 				<div class="card-header">
 					<h2>Counters</h2>
