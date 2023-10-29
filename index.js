@@ -255,6 +255,8 @@ function updateTables(){
 		c.setAttribute("class", "complex-input");
 		input = document.createElement("input"); // numeric
 		input.setAttribute("type", "number");
+		input.setAttribute("placeholder", "0");
+		input.setAttribute("aria-label", "Enter a value to increment the counter");
 		if(counter.min !== undefined){
 			input.setAttribute("min", counter.min);
 		}
@@ -300,6 +302,8 @@ function updateTables(){
 		c.setAttribute("class", "complex-input");
 		input = document.createElement("input"); // numeric
 		input.setAttribute("type", "number");
+		input.setAttribute("placeholder", "0");
+		input.setAttribute("aria-label", "Enter a value to increment the counter");
 		if(gauge.min !== undefined){
 			input.setAttribute("min", gauge.min);
 		}

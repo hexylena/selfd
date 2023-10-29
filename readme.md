@@ -40,10 +40,9 @@ it'll be relatively automation free ofc.
 - [x] units
 - [x] gauge, timer
 - [x] +N dialog
-- [ ] undo!!!
 - [x] version the data even if not supporting migrations yet
-- [ ] a11y testing (esp for mutable values, dialogs)
-- [ ] add element dialog improvements (wtf does this mean?)
+- [x] a11y testing (esp for mutable values, dialogs)
+- [ ] undo!!!
 - [ ] graphs
 
 ## graphing plan
@@ -51,7 +50,7 @@ it'll be relatively automation free ofc.
 by default everything, let folks drill down by one or more keys in case they didn't organise well. minimal UI.
 zoom?
 
-also want a calendar view 
+also want a calendar view
 
 ## sync story
 

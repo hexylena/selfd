@@ -73,6 +73,9 @@ footer nav {
 	background: var(--header);
 	/* ,,,, */
 }
+footer nav a {
+	color: black !important;
+}
 
 
 

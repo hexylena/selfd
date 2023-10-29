@@ -1,8 +1,10 @@
-<html>
+ <!DOCTYPE html>
+<html lang="en">
 	<head>
 		<title>SelfD</title>
 
 		<meta charset="utf-8">
+		<meta name="description" content="statsd for urself, track small occurrences">
 
 		<link rel="stylesheet" href="css/pico.fluid.classless.min.css">
 		<link rel="stylesheet" href="css/style.css">
@@ -16,7 +18,6 @@
 		<meta name="application-name" content="Counter">
 
 		<link rel="manifest" href="manifest.json">
-		<script src="moment.min.js"></script>
 	</head>
 	<body>
 		<header>
@@ -92,6 +93,7 @@
 		</main>
 		<footer>
 			<nav>
+				<ul>
 				<li>
 					<p>
 					The <a href="https://github.com/hexylena/selfd">Code</a> is licensed under AGPL-3.0-or-later.
@@ -104,6 +106,7 @@
 					<button role="button" id="reset">Reset to Example</button>
 					<button role="button" id="clear-example">Clear Example Data</button>
 				</li>
+				</ul>
 			</nav>
 		</footer>
 
@@ -196,6 +199,7 @@
 			</footer>
 		</article>
 	</dialog>
+	<script src="moment.min.js"></script>
 	<script src="lib.js"></script>
 	<script src="index.js"></script>
 </html>
