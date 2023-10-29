@@ -15,3 +15,7 @@ function makeRow(elements){
 	});
 	return row;
 }
+
+if ('serviceWorker' in navigator) {
+	navigator.serviceWorker.register('service-worker.js');
+}
