@@ -24,6 +24,24 @@ body {
 	--muted-color: #000 !important; /* for my colour issues */
 	--color: #000 !important;
 }
+
+body.compact * {
+	--block-spacing-vertical: 0.5em!important;
+	--typography-spacing-vertical: 0 !important;
+}
+body.compact header nav {
+	padding: 0 1em !important;
+}
+
+body.compact ul#all {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+body.compact ul#all li {
+	list-style-type: none;
+	}
+
 @media only screen and (prefers-color-scheme: dark) {
 	body {
 		--primary: #89aee1 !important;
@@ -65,7 +83,7 @@ nav {
 	background: var(--header);
 	box-shadow: 8px 8px black;
 	border: 2px solid black;
-	border-radius: 0;
+	border-radius: 40px 0 40px 0;
 	padding: 0.5em;
 }
 footer nav {
@@ -95,6 +113,21 @@ table tr.subheader td {
 	.complex-input {
 		display: flex;
 	}
+}
+
+body.compact .complex-input {
+	display: flex !important;
+	flex-direction: row !important;
+}
+
+body.compact .complex-input input {
+	width: 5em;
+	border-radius: 25px 0 0 25px;
+	box-shadow: 6px 6px black;
+}
+body.compact .complex-input button {
+	border-radius: 0 25px 25px 0 !important;
+	z-index: 1;
 }
 
 .card-header {

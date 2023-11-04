@@ -1,3 +1,4 @@
+let data, prefs;
 const APP_DATA_VERSION = 1;
 const EXAMPLE_DATA = {
 	VERSION: 1,
@@ -69,23 +70,40 @@ const EXAMPLE_DATA = {
 				{start: "2023-01-01T12:00:00.000Z", end: "2023-01-05T12:00:00.000Z"},
 			]
 		}
-	}
+	},
+	last_update: "2023-01-01T12:00:00.000Z"
 }
 
 function loadData(){
-	let d = JSON.parse(localStorage.getItem("data"));
-
-	if (d !== null && d.VERSION !== null && d.VERSION !== undefined && d.VERSION != APP_DATA_VERSION) {
-		if(confirm("Data version mismatch. Triggering a download of your data. Accept to download a copy of your data.")){
-			triggerDownload(JSON.stringify(data), 'application/json', 'export.json');
-		}
+	if(prefs.url && prefs.key){
+		console.log(`Loading data ${prefs.url}`);
+		retrieveData(prefs.url, prefs.key).then(d => {
+			server_data = momentifyData(d);
+			local_data = momentifyData(loadDataLocal());
+			// If the server data is newer, check that the user wants to use that.
+			if (!local_data.last_update || server_data.last_update.isAfter(local_data.last_update)) {
+				if(confirm("Server data is newer than local data. Do you want to use the server data?")){
+					data = server_data;
+				} else {
+					data = local_data;
+				}
+			} else {
+				// Otherwise the server's data is older, so, push to the server
+				data = local_data;
+				persistData(prefs, data);
+			}
+			updateTables(false);
+		})
+	} else {
+		console.log(`Loading data from local storage`);
+		data = momentifyData(loadDataLocal());
+		updateTables(false);
 	}
+}
 
-	if (d === null) {
-		d = EXAMPLE_DATA;
-	}
-
+function momentifyData(d){
 	// Convert all datapoints to momentjs
+	d.last_update = moment(d.last_update);
 	for (var key in d.counters.simple) {
 		d.counters.simple[key].values.forEach((v, i) => {
 			d.counters.simple[key].values[i] = moment(v);
@@ -110,69 +128,30 @@ function loadData(){
 	return d;
 }
 
-// Load the data from local storage
-let data;
-data = loadData();
+function loadDataLocal(){
+	let d = JSON.parse(localStorage.getItem("data"));
 
-// Hook up dialog open buttons
-document.querySelectorAll("button[data-dialog]").forEach(button => {
-	button.addEventListener("click", (evt) => {
-		let dialog_id = evt.target.dataset.dialog
-		document.getElementById(dialog_id).showModal();
-	});
-})
-
-// Cancel buttons should close the dialog
-document.querySelectorAll("dialog button[data-action='cancel']").forEach(button => {
-	button.addEventListener("click", (evt) => {
-		evt.target.closest("dialog").close();
-	});
-})
-
-// Confirm buttons will need more login.
-document.querySelectorAll("dialog button.confirm").forEach(button => {
-	button.addEventListener("click", (evt) => {
-		let dialog = evt.target.closest("dialog");
-		// Get form fields
-		let inputs = dialog.querySelectorAll("input, select");
-		let form = Object.fromEntries([...inputs].map(i => {
-			if(i.type == "checkbox"){
-				return [i.name, i.checked]
-			} else {
-				return [i.name, i.value || null]
-			}
-		}))
-		form.values = [];
-
-		// get type, the dialog's id without add-type-
-		let type = dialog.id.split("-").slice(2)[0] + 's';
-		if(type == "counters"){
-			if (form.simple) {
-				data[type].simple[form.key] = form;
-			} else {
-				data[type].complex[form.key] = form;
-			}
-		} else {
-			data[type][form.key] = form;
+	if (d !== null && d.VERSION !== null && d.VERSION !== undefined && d.VERSION != APP_DATA_VERSION) {
+		if(confirm("Data version mismatch. Triggering a download of your data. Accept to download a copy of your data.")){
+			triggerDownload(JSON.stringify(data), 'application/json', 'export.json');
 		}
+	}
 
-		inputs.forEach(i => i.value = "");
-		dialog.close();
+	if (d === null) {
+		d = EXAMPLE_DATA;
+	}
 
-		saveData(data);
-		updateTables();
-	});
-})
+	return d;
+}
 
 // Save the data to local storage
 function saveData() {
-	localStorage.setItem("data", JSON.stringify(data));
+	persistData(prefs, data)
 	updateTables();
 }
 
 function incrementCounterSimple(key){
 	data.counters.simple[key].values.push(moment());
-	updateTables();
 	saveData();
 }
 
@@ -181,7 +160,6 @@ function incrementCounterComplex(key, val){
 		moment(),
 		parseInt(val)
 	]);
-	updateTables();
 	saveData();
 }
 
@@ -190,7 +168,6 @@ function setGauge(key, val){
 		moment(),
 		parseInt(val)
 	]);
-	updateTables();
 	saveData();
 }
 
@@ -204,12 +181,18 @@ function toggleTimer(key){
 	} else {
 		timer.values.slice(-1)[0].end = moment();
 	}
-	updateTables();
 	saveData();
 }
 
+function updateTables(update){
+	if(MODE === 'compact'){
+		updateTablesCompact(update);
+	} else {
+		updateTablesDefault(update);
+	}
+}
 
-function updateTables(){
+function updateTablesDefault(update){
 	// For each counter, load into the table #counters
 	const countertable = document.querySelector("#counters tbody")
 	countertable.innerHTML = "";
@@ -362,20 +345,138 @@ function updateTables(){
 
 		timerstable.appendChild(row);
 	}
+}
+
+
+function updateTablesCompact(update){
+	function Li(e){
+		var li = document.createElement("li");
+		li.appendChild(e);
+		return li;
+	}
+
+	// For each counter, load into the table #counters
+	const all = document.querySelector("#all")
+	all.innerHTML = "";
+	for (var key in data.counters.simple) {
+		var counter = data.counters.simple[key];
+		button = document.createElement("button");
+		button.dataset.key = key;
+		if(counter.values.length > 0){
+			button.innerHTML = `${key} (${counter.values.slice(-1)[0].fromNow()})`;
+		} else {
+			button.innerHTML = `${key}`;
+		}
+		button.addEventListener("click", (e) => {
+			incrementCounterSimple(e.target.dataset.key);
+		});
+
+		all.appendChild(Li(button));
+	}
+
+	for (var key in data.counters.complex) {
+		var counter = data.counters.complex[key];
+
+		var c = document.createElement("div");
+		c.setAttribute("class", "complex-input");
+		input = document.createElement("input"); // numeric
+		input.setAttribute("type", "number");
+		input.setAttribute("placeholder", "0");
+		input.setAttribute("aria-label", "Enter a value to increment the counter");
+		if(counter.min !== undefined){
+			input.setAttribute("min", counter.min);
+		}
+		if(counter.max !== undefined){
+			input.setAttribute("max", counter.max);
+		}
+
+		button = document.createElement("button");
+		button.disabled = true;
+		button.dataset.key = key;
+		if(counter.values.length > 0){
+			button.innerHTML = `${key} (${counter.values.length ? counter.values.slice(-1)[0][1] : ""} ${counter.unit ? counter.unit : ""} @ ${counter.values.slice(-1)[0][0].fromNow()})`
+		} else {
+			button.innerHTML = `${key}`;
+		}
+		input.addEventListener("input", (e) => {
+			// enable the button
+			e.target.nextSibling.disabled = false;
+		});
+		button.addEventListener("click", (e) => {
+			incrementCounterComplex(e.target.dataset.key, e.target.previousSibling.value);
+		});
+		c.appendChild(input);
+		c.appendChild(button);
+
+		all.appendChild(Li(c));
+	}
+
+	// Gauges
+	for (var key in data.gauges) {
+		var gauge = data.gauges[key];
+
+		var c = document.createElement("div");
+		c.setAttribute("class", "complex-input");
+		input = document.createElement("input"); // numeric
+		input.setAttribute("type", "number");
+		input.setAttribute("placeholder", "0");
+		input.setAttribute("aria-label", "Enter a value to increment the counter");
+		if(gauge.min !== undefined){
+			input.setAttribute("min", gauge.min);
+		}
+		if(gauge.max !== undefined){
+			input.setAttribute("max", gauge.max);
+		}
+		if(gauge.step !== undefined){
+			input.setAttribute("step", gauge.step);
+		}
+
+		button = document.createElement("button");
+		button.disabled = true;
+		button.dataset.key = key;
+		if(gauge.values.length > 0){
+			button.innerHTML = `${key} (${gauge.values.length ? gauge.values.slice(-1)[0][1] : ""} ${gauge.unit ? gauge.unit : ""} @ ${gauge.values.slice(-1)[0][0].fromNow()})`;
+		} else {
+			button.innerHTML = key;
+		}
+		input.addEventListener("input", (e) => {
+			// enable the button
+			e.target.nextSibling.disabled = false;
+		});
+		button.addEventListener("click", (e) => {
+			setGauge(e.target.dataset.key, e.target.previousSibling.value);
+		});
+		c.appendChild(input);
+		c.appendChild(button);
+
+		all.appendChild(Li(c));
+
+	}
+
+	// timers
+	for (var key in data.timers) {
+		var timer = data.timers[key];
+
+		var button = document.createElement("button");
+		button.dataset.key = key;
+		if(timer.values.length > 0 && !timer.values.slice(-1)[0].end.isValid()){
+			button.innerHTML = `End ${key} (Running since ${timer.values.slice(-1)[0].start.fromNow()})`;
+		} else {
+			button.innerHTML = `Start ${key}`;
+		}
+		input.addEventListener("input", (e) => {
+			// enable the button
+			e.target.nextSibling.disabled = false;
+		});
+		button.addEventListener("click", (e) => {
+			toggleTimer(e.target.dataset.key);
+		});
+
+		all.appendChild(Li(button));
+	}
 
 
 }
-
-updateTables();
-
-// When user changes the value, update the validation
-document.querySelectorAll("input[required]").forEach(i => {
-	i.setAttribute('aria-invalid', true);
-	i.addEventListener("input", function(e) {
-		// set aria-invalid="true" if the input is invalid, and set an appropriate error message
-		e.target.setAttribute('aria-invalid', e.target.value.length == 0);
-	});
-});
 
 function triggerDownload(contents, type, filename){
 	var a = window.document.createElement('a');
@@ -440,31 +541,145 @@ function toInflux(d){
 	return lines
 }
 
-document.getElementById("export").addEventListener("click", () => {
-	triggerDownload(JSON.stringify(data), 'application/json', 'export.json');
-})
 
-document.getElementById("export-influxdb").addEventListener("click", () => {
-	triggerDownload(toInflux(data).join("\n"), 'text/plain', 'export.influx.txt');
-})
+function hookUpButtons(){
+	// Hook up dialog open buttons
+	document.querySelectorAll("button[data-dialog]").forEach(button => {
+		button.addEventListener("click", (evt) => {
+			let dialog_id = evt.target.dataset.dialog
+			document.getElementById(dialog_id).showModal();
+		});
+	})
 
-document.getElementById("reset").addEventListener("click", () => {
-	if(confirm("Are you sure you want to reset to the example data?")){
-		localStorage.clear();
-		data = loadData();
-		updateTables();
+	// Cancel buttons should close the dialog
+	document.querySelectorAll("dialog button[data-action='cancel']").forEach(button => {
+		button.addEventListener("click", (evt) => {
+			evt.target.closest("dialog").close();
+		});
+	})
+
+	// Confirm buttons will need more login.
+	document.querySelectorAll("dialog.new button.confirm").forEach(button => {
+		button.addEventListener("click", (evt) => {
+			let dialog = evt.target.closest("dialog");
+			// Get form fields
+			let inputs = dialog.querySelectorAll("input, select");
+			let form = Object.fromEntries([...inputs].map(i => {
+				if(i.type == "checkbox"){
+					return [i.name, i.checked]
+				} else {
+					return [i.name, i.value || null]
+				}
+			}))
+			form.values = [];
+
+			// get type, the dialog's id without add-type-
+			let type = dialog.id.split("-").slice(2)[0] + 's';
+			if(type == "counters"){
+				if (form.simple) {
+					data[type].simple[form.key] = form;
+				} else {
+					data[type].complex[form.key] = form;
+				}
+			} else {
+				data[type][form.key] = form;
+			}
+
+			inputs.forEach(i => i.value = "");
+			dialog.close();
+
+			saveData();
+		});
+	})
+
+	document.querySelectorAll("dialog#preferences button.confirm").forEach(button => {
+		button.addEventListener("click", (evt) => {
+			let dialog = evt.target.closest("dialog");
+			// Get form fields
+			let inputs = dialog.querySelectorAll("input, select");
+			let form = Object.fromEntries([...inputs].map(i => {
+				if(i.type == "checkbox"){
+					return [i.name, i.checked]
+				} else {
+					return [i.name, i.value || null]
+				}
+			}))
+
+			prefs = form;
+			localStorage.setItem("preferences", JSON.stringify(form));
+			dialog.close();
+		});
+	})
+
+	// When user changes the value, update the validation
+	document.querySelectorAll("input[required]").forEach(i => {
+		i.setAttribute('aria-invalid', true);
+		i.addEventListener("input", function(e) {
+			// set aria-invalid="true" if the input is invalid, and set an appropriate error message
+			e.target.setAttribute('aria-invalid', e.target.value.length == 0);
+		});
+	});
+
+
+	document.getElementById("export").addEventListener("click", () => {
+		triggerDownload(JSON.stringify(data), 'application/json', 'export.json');
+	})
+
+	document.getElementById("export-influxdb").addEventListener("click", () => {
+		triggerDownload(toInflux(data).join("\n"), 'text/plain', 'export.influx.txt');
+	})
+
+	document.getElementById("reset").addEventListener("click", () => {
+		if(confirm("Are you sure you want to reset to the example data?")){
+			localStorage.clear();
+			data = loadData();
+			updateTables();
+		}
+	})
+
+	document.getElementById("clear-example").addEventListener("click", () => {
+		if(confirm("Are you sure you want to clear all data?")){
+			// Clone example data
+			data = JSON.parse(JSON.stringify(EXAMPLE_DATA));
+			data.counters.simple = {};
+			data.counters.complex = {};
+			data.gauges = {};
+			data.timers = {};
+
+			saveData();
+		}
+	})
+
+	// Load user preferences from local storage
+	document.querySelectorAll("input[data-store]").forEach(input => {
+		// That data-store attribute is the JS variable in which the
+		// data is persisted, so, load it from there.
+		console.log(`Loading ${input.dataset.store} (${eval(input.dataset.store)}) from localStorage and setting ${input}`);
+		if(input.type == "checkbox"){
+			input.checked = eval(input.dataset.store);
+		} else {
+			input.value = eval(input.dataset.store);
+		}
+	})
+}
+
+function loadPreferences(){
+	let prefs = localStorage.getItem("preferences");
+	if(prefs){
+		p = JSON.parse(prefs);
+		if(p.compact){
+			document.body.classList.add("compact");
+		}
+		return p;
+	} else {
+		return {};
 	}
-})
+}
 
-document.getElementById("clear-example").addEventListener("click", () => {
-	if(confirm("Are you sure you want to clear all data?")){
-		data = EXAMPLE_DATA;
-		data.counters.simple = {};
-		data.counters.complex = {};
-		data.gauges = {};
-		data.timers = {};
+// Load the data from local storage
+prefs = loadPreferences();
+hookUpButtons();
+loadData();
 
-		saveData(data);
-		updateTables();
-	}
-})
+// Every 5 minutes check for fresh data
+setInterval(loadData, 5 * 60 * 1000);

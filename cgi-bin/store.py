@@ -44,6 +44,11 @@ def answer(contents):
 if not re.match(r"^[a-f0-9-]{36}$", key):
     answer('{"error": "invalid key"}')
 
+# Support HEAD requests
+# if os.environ['REQUEST_METHOD'] == 'HEAD':
+#     print("Content-Type: application/json\n")
+#     import sys; sys.exit(0)
+
 # They need to supply an action they want to do
 method = form["action"].value
 

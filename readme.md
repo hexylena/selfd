@@ -63,9 +63,7 @@ also want a calendar view
 
 ## sync story
 
-there is none.
-
-would be nice tho since otherwise you have to back it up. i don't want to run a KV store, and then we need encryption to make sure I cant see it? reccies welcome.
+there is one now! please run one yourself. See `cgi-bin/store.py` for an example implementation. It is recommended to run it yourself on your tailscale or so.
 
 ## LICENSE
 

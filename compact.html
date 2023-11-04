@@ -22,7 +22,7 @@
 		<script src="https://js.sentry-cdn.com/83b4d2a305171fbf3bd9567c60620716.min.js" crossorigin="anonymous"></script>
 		-->
 	</head>
-	<body>
+	<body class="compact">
 		<header>
 			<nav>
 				<ul>
@@ -41,78 +41,17 @@
 
 		<main>
 			<article>
-				<h2>About</h2>
-				<!--
-				<p style="background: red">
-				Warning: this version includes sentry tracing until I figure out what i did wrong.
-				</p>
-				-->
-				<p>
-				StatsD is a network daemon that listens for metrics, like counters and timers, and sends aggregates to one or more pluggable backend services (e.g., <a href="https://graphiteapp.org/">Graphite</a>).
-				</p>
-				<p>
-				This isn't that. It's <i>kinda sorta</i> like
-				that if you squint but for yourself. So it's
-				just stored within your browser's localStorage,
-				or a server if you configure one.
-				</p>
-				<p>
-				Nevertheless the point is to have a simple way to record statistics/values/etc, and then view a quick graph of them
-				</p>
-			</article>
-			<article>
+				<ul id="all">
+				</ul>
+
+				<hr/>
 				<div class="card-header">
-					<h2>Counters</h2>
-					<button role="button" data-dialog="add-new-counter">+</button>
+					<button role="button" data-dialog="add-new-counter">+Counter</button>
+					<button role="button" data-dialog="add-new-gauge">+Gauge</button>
+					<button role="button" data-dialog="add-new-timer">+Timer</button>
 				</div>
-			<table id="counters" role='grid'>
-				<thead>
-					<tr>
-						<th scope="col">Key</th>
-						<th scope="col">Value</th>
-						<th scope="col">Last Updated</th>
-					</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
 			</article>
 
-			<article>
-				<div class="card-header">
-					<h2>Gauges</h2>
-					<button role="button" data-dialog="add-new-gauge">+</button>
-				</div>
-			<table id="gauges" role='grid'>
-				<thead>
-					<tr>
-						<th scope="col">Key</th>
-						<th scope="col">Last Value</th>
-						<th scope="col">Last Updated</th>
-					</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
-			</article>
-
-			<article>
-				<div class="card-header">
-					<h2>Timers</h2>
-					<button role="button" data-dialog="add-new-timer">+</button>
-				</div>
-			<table id="timers" role='grid'>
-				<thead>
-					<tr>
-						<th scope="col">Key</th>
-						<th scope="col">Interval Count</th>
-						<th scope="col">Last Updated</th>
-					</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
-			</article>
 
 		</main>
 		<footer>
@@ -248,6 +187,7 @@
 			</footer>
 		</article>
 	</dialog>
+	<script>const MODE = 'compact';</script>
 	<script src="moment.min.js"></script>
 	<script src="lib.js"></script>
 	<script src="index.js"></script>

@@ -1,0 +1,7 @@
+body.compact {
+	--spacing: 0;
+}
+
+body.compact .hide-in-compact {
+	display: none;
+}
