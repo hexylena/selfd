@@ -358,7 +358,8 @@ function updateTablesCompact(update){
 	// For each counter, load into the table #counters
 	const all = document.querySelector("#all")
 	all.innerHTML = "";
-	for (var key in data.counters.simple) {
+
+	function renderCounter(key){
 		var counter = data.counters.simple[key];
 		button = document.createElement("button");
 		button.dataset.key = key;
@@ -374,7 +375,7 @@ function updateTablesCompact(update){
 		all.appendChild(Li(button));
 	}
 
-	for (var key in data.counters.complex) {
+	function renderCounterComplex(key){
 		var counter = data.counters.complex[key];
 
 		var c = document.createElement("div");
@@ -411,8 +412,7 @@ function updateTablesCompact(update){
 		all.appendChild(Li(c));
 	}
 
-	// Gauges
-	for (var key in data.gauges) {
+	function renderGauge(key){
 		var gauge = data.gauges[key];
 
 		var c = document.createElement("div");
@@ -453,16 +453,15 @@ function updateTablesCompact(update){
 
 	}
 
-	// timers
-	for (var key in data.timers) {
+	function renderTimer(key){
 		var timer = data.timers[key];
 
 		var button = document.createElement("button");
 		button.dataset.key = key;
 		if(timer.values.length > 0 && !timer.values.slice(-1)[0].end.isValid()){
-			button.innerHTML = `End ${key} (Running since ${timer.values.slice(-1)[0].start.fromNow()})`;
+			button.innerHTML = `${key}: stop (Running since ${timer.values.slice(-1)[0].start.fromNow()})`;
 		} else {
-			button.innerHTML = `Start ${key}`;
+			button.innerHTML = `${key}: start`;
 		}
 		input.addEventListener("input", (e) => {
 			// enable the button
@@ -475,7 +474,36 @@ function updateTablesCompact(update){
 		all.appendChild(Li(button));
 	}
 
+	var sortedkeys = [
+		...Object.keys(data.counters.simple).map(k => [k, 'simple']),
+		...Object.keys(data.counters.complex).map(k => [k, 'complex']),
+		...Object.keys(data.gauges).map(k => [k, 'gauges']),
+		...Object.keys(data.timers).map(k => [k, 'timers']),
+	]
+	// Sort the keys object by their first element of each pair
+	function compareFn(a, b){
+		if(a[0] < b[0]){ return -1 }
+		else if (a[0] > b[0]) {return 1}
+		else { return 0 }
+	}
+	sortedkeys.sort(compareFn);
 
+	sortedkeys.forEach(k => {
+		key = k[0]
+		type = k[1]
+		if(type == 'simple'){
+			renderCounter(key)
+		}
+		else if(type == 'complex'){
+			renderCounterComplex(key)
+		}
+		else if(type == 'gauges') {
+			renderGauge(key)
+		}
+		else {
+			renderTimer(key)
+		}
+	})
 }
 
 function triggerDownload(contents, type, filename){
