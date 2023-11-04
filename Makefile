@@ -1,5 +1,5 @@
 serve:
-	python -m http.server
+	python -m http.server --cgi
 
 assets/512.png: assets/logo.svg
 	convert -density 300 -resize 512x assets/logo.svg assets/512.png
