@@ -81,12 +81,14 @@ function loadData(){
 			server_data = momentifyData(d);
 			local_data = momentifyData(loadDataLocal());
 			// If the server data is newer, check that the user wants to use that.
-			if (!local_data.last_update || server_data.last_update.isAfter(local_data.last_update)) {
-				if(confirm("Server data is newer than local data. Do you want to use the server data?")){
-					data = server_data;
-				} else {
-					data = local_data;
-				}
+			// if (!local_data.last_update || server_data.last_update.isAfter(local_data.last_update)) {
+			// 	if(confirm("Server data is newer than local data. Do you want to use the server data?")){
+			// 		data = server_data;
+			// 	} else {
+			// 		data = local_data;
+			// 	}
+			if(server_data.last_update.isAfter(local_data.last_update)) {
+				data = server_data;
 			} else {
 				// Otherwise the server's data is older, so, push to the server
 				data = local_data;
@@ -190,6 +192,11 @@ function updateTables(update){
 	} else {
 		updateTablesDefault(update);
 	}
+	updateGraphs();
+}
+
+function updateGraphs(){
+	
 }
 
 function updateTablesDefault(update){
